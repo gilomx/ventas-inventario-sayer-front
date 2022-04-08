@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import { useAuth } from '../context/authContext'
 import {useNavigate} from 'react-router-dom'
-
+import logo from '../logo.svg'
 
 export function Login() {
 
@@ -33,22 +33,28 @@ export function Login() {
   }
 
     return (
-        <div>
+        <div className='flex items-center justify-center min-h-screen bg-gray-200'>
+            <div className="px-4 py-6 mt-4 text-left bg-white shadow-lg min-w-[300px] rounded-lg">
+            <img src={logo} alt="Logo" className='w-1/2 mx-auto mb-4'/>
             {error && <p>{error}</p>}
         
             <form onSubmit={handleSubmit}>
-                <label htmlFor="email">Email</label>
-                <input type="email" name="email" id="email" className='block' placeholder="hola@mail.com" 
+                <label htmlFor="email" className='text-gray-400'>Email</label>
+                <input type="email" name="email" id="email" 
+                className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5' placeholder="Email" 
                     onChange={handleChange}
                 />
 
-                <label htmlFor="password"></label>
-                <input type="password" name="password" id="password" className='block'
+                <label htmlFor="password" className='text-gray-400'>Password</label>
+                <input type="password" name="password" id="password"
+                className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5' placeholder='******'
                 onChange={handleChange}
                 />
 
-                <button>Login</button>
+                <button className='bg-sky-500 text-white px-6 py-1.5 rounded-lg'>Login</button>
             </form>
+
+            </div>
         </div>
     );
   }
