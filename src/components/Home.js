@@ -1,7 +1,6 @@
 import {useAuth} from '../context/authContext'
 
 export function Home() {
-  const {user} = useAuth()
-  console.log(user)
-  return <div>Home</div>
+  const {user, token} = useAuth()
+  return <div>Bienvenido {user.nombre} <br/> TU token es:{token}</div>
 }

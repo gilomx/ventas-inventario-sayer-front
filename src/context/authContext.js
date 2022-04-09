@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {createContext, useContext} from 'react';
 import axios from 'axios'
 
@@ -13,23 +13,37 @@ export const useAuth = () => {
 export function AuthProvider({children}){
 
     const [user, setUser] = useState(null)
+    const [token, setToken] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(()=> {
+        if(!token){
+            setLoading(false)
+            return
+        }
+    })
+    
 
     const login = async(email, password) => {
-        console.log('intentando login')
-        const response = await axios.post(`http://localhost:3000/api/auth/login`,{
+        // console.log('intentando login')
+        const {data} = await axios.post(`http://localhost:3000/api/auth/login`,{
             correo: email,
             password}).catch((error) => {
                 console.log(error.response)
                 throw new Error(error.response.data.msg)
             })
-        console.log('Response:')
-        console.log(response);
+        setUser(data.usuario)
+        setToken(data.token)
+        // console.log('Response:')
+        // console.log(user)
+        // console.log('token:')
+        // console.log(token)
     }
 
     
 
     return (
-        <authContext.Provider value ={{login}}>
+        <authContext.Provider value ={{login, user, token }}>
             {children}
         </authContext.Provider>
     )
