@@ -3,6 +3,7 @@ import { Home } from './components/Home';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import {AuthProvider} from './context/authContext'
+import {ProtectedRoute} from './components/ProtectedRoute'
 
 function App() {
 
@@ -10,7 +11,11 @@ function App() {
     <div>
       <AuthProvider>
       <Routes>
-        <Route path ="/" element={<Home/>} />
+        <Route path ="/" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
         <Route path = "/login" element = {<Login/>} />
         <Route path = "/register" element = {<Register/>} />
       </Routes>

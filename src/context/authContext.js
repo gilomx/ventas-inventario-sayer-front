@@ -12,16 +12,20 @@ export const useAuth = () => {
 
 export function AuthProvider({children}){
 
-    const [user, setUser] = useState(null)
-    const [token, setToken] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState([])
+    const [loading, setLoading] = useState(true);
 
-    useEffect(()=> {
-        if(!token){
+    useEffect(()=>{
+        const userStorage = localStorage.getItem('user');
+        if(userStorage){
+            setUser(JSON.parse(userStorage))
             setLoading(false)
             return
         }
-    })
+        setUser(null)
+        setLoading(false)
+    },[])
+
     
 
     const login = async(email, password) => {
@@ -32,8 +36,8 @@ export function AuthProvider({children}){
                 console.log(error.response)
                 throw new Error(error.response.data.msg)
             })
-        setUser(data.usuario)
-        setToken(data.token)
+        setUser(data)
+        localStorage.setItem('user', JSON.stringify(data))
         // console.log('Response:')
         // console.log(user)
         // console.log('token:')
@@ -43,7 +47,7 @@ export function AuthProvider({children}){
     
 
     return (
-        <authContext.Provider value ={{login, user, token }}>
+        <authContext.Provider value ={{login, user, loading }}>
             {children}
         </authContext.Provider>
     )
