@@ -51,7 +51,7 @@ export function Login() {
                 onChange={handleChange}
                 />
                 {error && <p className='mb-4 text-red-400 animate-fade-in-down'>{error}</p>}
-                <button className='bg-sky-500 text-white px-6 py-1.5 rounded-lg hover:bg-sky-600'>Login</button>
+                <button className='bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Login</button>
             </form>
 
             </div>
