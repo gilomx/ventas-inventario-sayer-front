@@ -31,7 +31,7 @@ export function AuthProvider({children}){
     const login = async(email, password) => {
         // console.log('intentando login')
         const {data} = await axios.post(`http://localhost:3000/api/auth/login`,{
-            correo: email,
+            email,
             password}).catch((error) => {
                 console.log(error.response)
                 throw new Error(error.response.data.msg)

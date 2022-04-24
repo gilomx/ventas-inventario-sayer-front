@@ -3,6 +3,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import {AuthProvider} from './context/authContext'
 import {ProtectedRoute} from './components/ProtectedRoute'
+import {DashboardLayout} from './components/DashboardLayout';
 
 function App() {
 
@@ -10,11 +11,14 @@ function App() {
     <div>
       <AuthProvider>
       <Routes>
-        <Route path ="/" element={
+        <Route path="/" element={
           <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
+            <DashboardLayout/>
+          </ProtectedRoute>}>
+          <Route path ="/" element={
+              <Home />
+          } />
+        </Route>
         <Route path = "/login" element = {<Login/>} />
         {/* <Route path = "/register" element = {<Register/>} /> */}
       </Routes>
