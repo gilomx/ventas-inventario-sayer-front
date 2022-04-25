@@ -7,6 +7,7 @@ import {DashboardLayout} from './components/DashboardLayout';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Productos } from './pages/Productos';
+import { AgregarProducto } from './pages/AgregarProducto';
 
 function App() {
 
@@ -23,6 +24,9 @@ function App() {
           } />
           <Route path ="/productos" element={
               <Productos />
+          }/>
+          <Route path ="/productos/agregar" element={
+            <AgregarProducto />
           } />
         </Route>
         <Route path = "/login" element = {<Login/>} />

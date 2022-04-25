@@ -1,5 +1,7 @@
 import {useState, useEffect} from 'react'
+import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
+
 
 export const Productos = () => {
     // Ejemplo de producto
@@ -18,6 +20,8 @@ export const Productos = () => {
 
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate()
 
     useEffect(()=>{
         const products = getProducts()
@@ -40,6 +44,11 @@ export const Productos = () => {
         console.log(products)
     }
 
+    const handleButton = (e) => {
+        e.preventDefault()
+        navigate("agregar")
+    }
+
 
     // const TableItems = (products) => {
     //     products.map((product,key) => (
@@ -57,13 +66,15 @@ export const Productos = () => {
       <>
           <div className='flex flex-nowrap justify-between p-12'>
             <form>
-              <input type="text" name="email" id="email" 
+              <input type="text" name="buscar" id="buscar" 
                     className='block w-96 bg-white rounded-lg 
                       p-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400'
                     placeholder='Buscar'
               />
             </form>
-            <button className='bg-sky-600 text-white px-6 p-1.5 rounded-lg hover:bg-sky-500'>Agregar nuevo</button>
+            <button
+                onClick={handleButton} 
+                className='bg-sky-600 text-white px-6 p-1.5 rounded-lg hover:bg-sky-500'>Agregar nuevo</button>
           </div>
           <div className='box-content p-2 mx-12 rounded-lg bg-white drop-shadow-sm'>
             {loading === true &&
@@ -85,11 +96,11 @@ export const Productos = () => {
                 <tbody>
                     {products.map((product,key) => (
                         <tr className='text-left text-base text-gray-500' key={key}>
-                            <td className='pb-2'>{product.productCode}</td>
-                            <td className='pb-2'>{product.name}</td>
-                            <td className='pb-2'>{product.category.name}</td>
-                            <td className='pb-2'>{product.purchasePrice}</td>
-                            <td className='pb-2'>{product.salePrice}</td>
+                            <td className='pb-3 font-normal'>{product.productCode}</td>
+                            <td className='pb-3 font-normal'>{product.name}</td>
+                            <td className='pb-3 font-normal'>{product.category.name}</td>
+                            <td className='pb-3 font-normal'>{product.purchasePrice}</td>
+                            <td className='pb-3 font-normal'>{product.salePrice}</td>
                         </tr>
                     ))}
                 </tbody>
