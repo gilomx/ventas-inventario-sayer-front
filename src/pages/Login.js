@@ -3,7 +3,7 @@ import { useAuth } from '../context/authContext'
 import {useNavigate} from 'react-router-dom'
 import logo from '../logo.svg'
 
-export function Login() {
+export const Login = () => {
 
   const [user, setUser] = useState({
     email:'',

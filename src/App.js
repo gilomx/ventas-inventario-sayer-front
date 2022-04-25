@@ -1,9 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { Login } from './pages/Login';
 import {AuthProvider} from './context/authContext'
+
 import {ProtectedRoute} from './components/ProtectedRoute'
 import {DashboardLayout} from './components/DashboardLayout';
+
+import { Home } from './pages/Home';
+import { Login } from './pages/Login';
+import { Productos } from './pages/Productos';
 
 function App() {
 
@@ -17,6 +20,9 @@ function App() {
           </ProtectedRoute>}>
           <Route path ="/" element={
               <Home />
+          } />
+          <Route path ="/productos" element={
+              <Productos />
           } />
         </Route>
         <Route path = "/login" element = {<Login/>} />

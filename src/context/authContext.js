@@ -10,7 +10,7 @@ export const useAuth = () => {
     return context
 }
 
-export function AuthProvider({children}){
+export const AuthProvider = ({children}) => {
 
     const [user, setUser] = useState([])
     const [loading, setLoading] = useState(true);
@@ -38,13 +38,7 @@ export function AuthProvider({children}){
             })
         setUser(data)
         localStorage.setItem('user', JSON.stringify(data))
-        // console.log('Response:')
-        // console.log(user)
-        // console.log('token:')
-        // console.log(token)
     }
-
-    
 
     return (
         <authContext.Provider value ={{login, user, loading }}>

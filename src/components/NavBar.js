@@ -1,7 +1,7 @@
 import logo from '../logo.svg'
 import {NavLink} from 'react-router-dom'
 
-function NavBar() {
+export const NavBar = () => {
   return (
     <div className='flex flex-col w-80 h-screen bg-gray-200 drop-shadow-md'>
         <div className='my-6 ml-8'>
@@ -30,5 +30,3 @@ function NavBar() {
       </div>
   )
 }
-
-export default NavBar

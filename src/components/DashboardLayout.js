@@ -1,5 +1,7 @@
-import NavBar from "./NavBar"
 import {useAuth} from '../context/authContext'
+
+import {NavBar} from "./NavBar"
+import {Outlet} from 'react-router-dom'
 
 export const DashboardLayout = ({children}) => {
     const {user} = useAuth()
@@ -14,7 +16,7 @@ export const DashboardLayout = ({children}) => {
         <div className='flex flex-col w-full bg-gray-100'>
             {/* Top Bar */}
             <div className='bg-sky-600 p-2.5 text-white text-right'> hola {name}</div>
-            {children}
+            <Outlet />
         </div>
         
         {/* <div>Bienvenido {nombre} <br/> TU token es:{token}</div> */}
