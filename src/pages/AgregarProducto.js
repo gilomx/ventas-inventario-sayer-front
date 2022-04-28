@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios'
 
 
@@ -13,7 +13,20 @@ export const AgregarProducto = () => {
         description:''
     })
     const [searchTerm, setSearchTerm] = useState('')
-    const [categories, setCategories] = useState([])
+    // const [categories, setCategories] = useState([])
+    const [suggestions, setSuggestions] = useState({
+        activeSuggestion: -1,
+        loadingSuggestions: false,
+        filteredSuggestions:[],
+        activeSuggestionUid: '',
+        activeSuggestionName:'',
+        isLoading: false
+    })
+
+    useEffect(() => {
+        console.log('Efecto:')
+        console.log(suggestions)
+    },[suggestions])
 
     const searchCategories = async(busqueda) => {
         // console.log('intentando login')
@@ -35,23 +48,76 @@ export const AgregarProducto = () => {
     }
 
     const handleKeyDown = (e) => {
-        if(e.keyCode==40){
-            alert('Keydown')
+        //Arrow Up
+        if(e.keyCode===38 && suggestions.filteredSuggestions.length !== 0){
+            e.preventDefault()
+            
+            if(suggestions.activeSuggestion>0){
+                setSuggestions({
+                    ...suggestions,
+                    activeSuggestion: suggestions.activeSuggestion-1,
+                    activeSuggestionName: suggestions.filteredSuggestions[suggestions.activeSuggestion-1].name
+                })
+                document.getElementById("category").value = suggestions.filteredSuggestions[suggestions.activeSuggestion-1].name
+                console.log(suggestions)
+            }
+        }
+        //ArrowDown
+        if(e.keyCode===40 || e.keyCode===9){
+            e.preventDefault()
+
+            if(suggestions.activeSuggestion<suggestions.filteredSuggestions.length-1){
+                setSuggestions({
+                    ...suggestions,
+                    activeSuggestion: suggestions.activeSuggestion+1,
+                    activeSuggestionName: suggestions.filteredSuggestions[suggestions.activeSuggestion+1].name
+                })
+                document.getElementById("category").value = suggestions.filteredSuggestions[suggestions.activeSuggestion+1].name
+            }
+            if(suggestions.activeSuggestion===suggestions.filteredSuggestions.length-1){
+                setSuggestions({
+                    ...suggestions,
+                    activeSuggestion: suggestions.activeSuggestion+1,
+                })
+                document.getElementById("category").value = searchTerm
+            }
+            if(!suggestions.filteredSuggestions.length){
+                e.preventDefault()
+                setSuggestions({
+                    ...suggestions,
+                    activeSuggestion: 0,
+                })
+            }
+            console.log("activeSuggestion:")
+            console.log(suggestions.activeSuggestion)
         }
     }
 
     const handleCategory = async(e) => {
-        setSearchTerm('')
+        e.preventDefault()
         setSearchTerm(e.target.value)
-        const categories = await searchCategories(searchTerm)
-        setCategories(categories)
+        setSuggestions({
+            ...suggestions,
+            isLoading:true
+        })
+        const categories = await searchCategories(e.target.value)
+        setSuggestions({
+            ...suggestions,
+            filteredSuggestions: categories,
+            activeSuggestion: -1,
+            isLoading: false
+        })
+    }
+
+    const handleForm = (e) => {
+        e.preventDefault()
     }
 
     return (
       <>
           <div className='box-content p-2 m-12 rounded-lg bg-white drop-shadow-sm'>
             <h1 className="text-xl">{"<-"} Agregar producto</h1>
-                <form>
+                <form onSubmit={handleForm}>
                     <div className="flex flex-auto">
                         <div className="flex-1 p-2">
                             <label htmlFor="productCode" className='text-gray-400'>Código</label>
@@ -89,16 +155,32 @@ export const AgregarProducto = () => {
                                 />
                                 {searchTerm.length!==0 &&
                                     <div className="absolute bg-gray-100 top-[95%] left-0 right-0 rounded-b-lg ring-1 ring-gray-200">
-                                        <div className="suggestion-item px-2 py-1 
-                                            hover:bg-sky-600 hover:text-white hover:px-3">
+                                        {suggestions.isLoading &&
+                                            <b>Loading</b>
+                                        }
+                                        {suggestions.filteredSuggestions.map((category,key) => (
+
+                                            key === suggestions.activeSuggestion ?
+                                                <div key={key} className="py-1 
+                                                    bg-sky-600 text-white px-3">
+                                                    {category.name}
+                                                </div>
+                                                :
+                                                <div key={key} className="px-2 py-1 
+                                                    hover:bg-sky-600 hover:text-white hover:px-3">
+                                                    {category.name}
+                                                </div>
+
+                                        ))}
+                                        <div className={
+                                            `${
+                                                suggestions.activeSuggestion===suggestions.filteredSuggestions.length ?
+                                                "py-1 bg-sky-600 text-white px-3" :
+                                                "px-2 py-1 hover:bg-sky-600 hover:text-white hover:px-3"
+                                            }`
+                                        }>
                                             <i>Crear: {searchTerm}</i>
                                         </div>
-                                        {categories.map((category,key) => (
-                                            <div key={key} className="suggestion-item px-2 py-1 
-                                                hover:bg-sky-600 hover:text-white hover:px-3">
-                                                {category.name}
-                                            </div>
-                                        ))}
                                     </div>
                                 }
                             </div>
