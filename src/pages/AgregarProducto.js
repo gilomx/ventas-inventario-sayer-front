@@ -16,10 +16,11 @@ export const AgregarProducto = () => {
     // const [categories, setCategories] = useState([])
     const [suggestions, setSuggestions] = useState({
         activeSuggestion: -1,
-        loadingSuggestions: false,
         filteredSuggestions:[],
         activeSuggestionUid: '',
         activeSuggestionName:'',
+        selectedCategory:'',
+        isSelected: false,
         isLoading: false
     })
 
@@ -48,6 +49,38 @@ export const AgregarProducto = () => {
     }
 
     const handleKeyDown = (e) => {
+        //Enter Key
+        if(e.key==='Enter'){
+            // e.preventDefault()
+            // alert('Enter')
+            if(suggestions.activeSuggestion===suggestions.filteredSuggestions.length){
+                setForm({
+                    ...form,
+                    category: 'Crear categoria'
+                })
+                setSuggestions({
+                    ...suggestions,
+                    filteredSuggestions:[],
+                    activeSuggestionUid: '',
+                    activeSuggestionName:'',
+                    isSelected: true
+                })
+            }else if(suggestions.activeSuggestion!=-1){       
+                setForm({
+                    ...form,
+                    category: suggestions.activeSuggestionUid,
+                    isSelected: true
+                })
+                setSuggestions({
+                    ...suggestions,
+                    filteredSuggestions:[],
+                    activeSuggestionUid: '',
+                    activeSuggestionName:'',
+                    selectedCategory: suggestions.activeSuggestionName,
+                    isSelected: true
+                })
+            }
+        }
         //Arrow Up
         if(e.keyCode===38 && suggestions.filteredSuggestions.length !== 0){
             e.preventDefault()
@@ -56,7 +89,8 @@ export const AgregarProducto = () => {
                 setSuggestions({
                     ...suggestions,
                     activeSuggestion: suggestions.activeSuggestion-1,
-                    activeSuggestionName: suggestions.filteredSuggestions[suggestions.activeSuggestion-1].name
+                    activeSuggestionName: suggestions.filteredSuggestions[suggestions.activeSuggestion-1].name,
+                    activeSuggestionUid: suggestions.filteredSuggestions[suggestions.activeSuggestion-1].uid
                 })
                 document.getElementById("category").value = suggestions.filteredSuggestions[suggestions.activeSuggestion-1].name
                 console.log(suggestions)
@@ -70,7 +104,8 @@ export const AgregarProducto = () => {
                 setSuggestions({
                     ...suggestions,
                     activeSuggestion: suggestions.activeSuggestion+1,
-                    activeSuggestionName: suggestions.filteredSuggestions[suggestions.activeSuggestion+1].name
+                    activeSuggestionName: suggestions.filteredSuggestions[suggestions.activeSuggestion+1].name,
+                    activeSuggestionUid: suggestions.filteredSuggestions[suggestions.activeSuggestion+1].uid
                 })
                 document.getElementById("category").value = suggestions.filteredSuggestions[suggestions.activeSuggestion+1].name
             }
@@ -78,6 +113,8 @@ export const AgregarProducto = () => {
                 setSuggestions({
                     ...suggestions,
                     activeSuggestion: suggestions.activeSuggestion+1,
+                    activeSuggestionName:'',
+                    activeSuggestionUid:''
                 })
                 document.getElementById("category").value = searchTerm
             }
@@ -105,6 +142,7 @@ export const AgregarProducto = () => {
             ...suggestions,
             filteredSuggestions: categories,
             activeSuggestion: -1,
+            isSelected: false,
             isLoading: false
         })
     }
@@ -146,14 +184,29 @@ export const AgregarProducto = () => {
                             
                             <div className="relative">
                                 <label htmlFor="category" className='text-gray-400'>Categoría</label>
-                                <input 
-                                    onChange={handleCategory}
-                                    onKeyDown={handleKeyDown}
-                                    type="text" name="category" id="category" 
-                                    className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 
-                                        focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                                />
-                                {searchTerm.length!==0 &&
+                                {!suggestions.isSelected &&
+                                    <input 
+                                        onChange={handleCategory}
+                                        onKeyDown={handleKeyDown}
+                                        type="text" name="category" id="category" 
+                                        className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 
+                                            focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                                    />
+                                }
+
+                                {suggestions.isSelected &&
+                                <>
+                                    <input 
+                                        disabled
+                                        type="text" name="category" id="category" 
+                                        className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 
+                                            focus:outline-none focus:ring-1 focus:ring-gray-200'
+                                        value={suggestions.selectedCategory}
+                                    />
+                                </>
+                                }
+
+                                {(searchTerm.length!==0 && suggestions.isSelected===false) &&
                                     <div className="absolute bg-gray-100 top-[95%] left-0 right-0 rounded-b-lg ring-1 ring-gray-200">
                                         {suggestions.isLoading &&
                                             <b>Loading</b>
