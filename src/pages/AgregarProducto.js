@@ -3,6 +3,7 @@ import {useEffect, useState, useRef} from 'react'
 import axios from 'axios'
 
 import { XCircleIcon } from '@heroicons/react/solid'
+import Loader from '../components/Loader'
 
 export const AgregarProducto = () => {
 
@@ -78,15 +79,22 @@ export const AgregarProducto = () => {
         console.log(form)
     }
 
+    const handleClickCategory = (key) => {
+        alert('Mouse Enter ' + key)
+    }
+
     const handleKeyDown = async(e) => {
         //Enter Key
         if(e.key==='Enter'){
             // e.preventDefault()
             // alert('Enter')
             if(suggestions.activeSuggestion===suggestions.filteredSuggestions.length){
-                
+                setSuggestions({
+                    ...suggestions,
+                    isLoading:true
+                })
+
                 const category = await addCategory(searchTerm)
-                
                 setForm({
                     ...form,
                     category: category.uid
@@ -97,7 +105,8 @@ export const AgregarProducto = () => {
                     activeSuggestionUid: '',
                     activeSuggestionName:'',
                     selectedCategory: category.name,
-                    isSelected: true
+                    isSelected: true,
+                    isLoading:false
                 })
             }else if(suggestions.activeSuggestion!==-1){       
                 setForm({
@@ -263,33 +272,40 @@ export const AgregarProducto = () => {
                                 }
 
                                 {(searchTerm.length!==0 && suggestions.isSelected===false) &&
-                                    <div className="absolute bg-gray-100 top-[95%] left-0 right-0 rounded-b-lg ring-1 ring-gray-200">
+                                    <div className="select-none absolute bg-gray-100 top-[95%] left-0 right-0 rounded-b-lg ring-1 ring-gray-200">
                                         {suggestions.isLoading &&
-                                            <b>Loading</b>
+                                            <Loader/>
                                         }
-                                        {suggestions.filteredSuggestions.map((category,key) => (
+                                        {!suggestions.isLoading &&
+                                            suggestions.filteredSuggestions.map((category,key) => (
 
                                             key === suggestions.activeSuggestion ?
-                                                <div key={key} className="py-1 
-                                                    bg-sky-600 text-white px-3">
+                                                <div key={key} onClick={() => handleClickCategory(key)} className="py-1 
+                                                    bg-sky-600 text-white px-3 cursor-pointer">
                                                     {category.name}
                                                 </div>
                                                 :
-                                                <div key={key} className="px-2 py-1 
-                                                    hover:bg-sky-600 hover:text-white hover:px-3">
+                                                <div key={key} onClick={() => handleClickCategory(key)} className="px-2 py-1 
+                                                    hover:bg-sky-600 hover:text-white hover:px-3 cursor-pointer">
                                                     {category.name}
                                                 </div>
 
                                         ))}
-                                        <div className={
-                                            `${
-                                                suggestions.activeSuggestion===suggestions.filteredSuggestions.length ?
-                                                "py-1 bg-sky-600 text-white px-3" :
-                                                "px-2 py-1 hover:bg-sky-600 hover:text-white hover:px-3"
-                                            }`
-                                        }>
-                                            <i>Crear: {searchTerm}</i>
-                                        </div>
+
+                                        {!suggestions.isLoading &&
+                                            <div className={
+                                                `${
+                                                    suggestions.activeSuggestion===suggestions.filteredSuggestions.length ?
+                                                    "cursor-pointer py-1 bg-sky-600 text-white px-3" :
+                                                    "cursor-pointer px-2 py-1 hover:bg-sky-600 hover:text-white hover:px-3"
+                                                }`
+                                                
+                                            }
+                                            onClick={() => handleClickCategory(suggestions.filteredSuggestions.length)}
+                                            >
+                                                <i>Crear: {searchTerm}</i>
+                                            </div>
+                                        }
                                     </div>
                                 }
                             </div>
