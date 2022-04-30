@@ -1,8 +1,12 @@
-import {useEffect, useState} from 'react'
+import {useAuth} from '../context/authContext'
+import {useEffect, useState, useRef} from 'react'
 import axios from 'axios'
 
+import { XCircleIcon } from '@heroicons/react/solid'
 
 export const AgregarProducto = () => {
+
+    const {user} = useAuth()
 
     const [form, setForm] = useState({
         productCode:'',
@@ -12,6 +16,7 @@ export const AgregarProducto = () => {
         name:'',
         description:''
     })
+    
     const [searchTerm, setSearchTerm] = useState('')
     // const [categories, setCategories] = useState([])
     const [suggestions, setSuggestions] = useState({
@@ -24,16 +29,41 @@ export const AgregarProducto = () => {
         isLoading: false
     })
 
+    const categoryInput = useRef(null)
+    const firstRender = useRef(true);
+
     useEffect(() => {
-        console.log('Efecto:')
-        console.log(suggestions)
+        if(firstRender.current){
+            firstRender.current = false
+        }
+        if(!suggestions.isSelected && categoryInput && firstRender.current===false){
+            categoryInput.current.focus()
+        }
     },[suggestions])
+
+    const addCategory = async(name) => {
+        const options ={
+            headers:{
+                'x-token': user.token
+            }
+        }
+        console.log('Options')
+        console.log(options)
+        // const {data:{categories}}
+        const {data} = await axios.post(`http://localhost:3000/api/categorias`,{
+            "name": name
+        }, options)
+        console.log('Category created:')
+        console.log(data)
+
+        return data
+    }
 
     const searchCategories = async(busqueda) => {
         // console.log('intentando login')
         const {data:{categories}} = await axios.post(`http://localhost:3000/api/categorias/search`,{
             "busqueda": busqueda
-        })
+        },)
         console.log("busqueda")
         console.log(busqueda)
         console.log("Peticion:")
@@ -48,24 +78,28 @@ export const AgregarProducto = () => {
         console.log(form)
     }
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = async(e) => {
         //Enter Key
         if(e.key==='Enter'){
             // e.preventDefault()
             // alert('Enter')
             if(suggestions.activeSuggestion===suggestions.filteredSuggestions.length){
+                
+                const category = await addCategory(searchTerm)
+                
                 setForm({
                     ...form,
-                    category: 'Crear categoria'
+                    category: category.uid
                 })
                 setSuggestions({
                     ...suggestions,
                     filteredSuggestions:[],
                     activeSuggestionUid: '',
                     activeSuggestionName:'',
+                    selectedCategory: category.name,
                     isSelected: true
                 })
-            }else if(suggestions.activeSuggestion!=-1){       
+            }else if(suggestions.activeSuggestion!==-1){       
                 setForm({
                     ...form,
                     category: suggestions.activeSuggestionUid,
@@ -147,6 +181,23 @@ export const AgregarProducto = () => {
         })
     }
 
+    const clearCategory = () => {
+        setSuggestions({
+            activeSuggestion: -1,
+            filteredSuggestions:[],
+            activeSuggestionUid: '',
+            activeSuggestionName:'',
+            selectedCategory:'',
+            isSelected: false,
+            isLoading: false
+        })
+        setForm({
+            ...form,
+            category:''
+        })
+        setSearchTerm('')
+    }
+
     const handleForm = (e) => {
         e.preventDefault()
     }
@@ -186,6 +237,7 @@ export const AgregarProducto = () => {
                                 <label htmlFor="category" className='text-gray-400'>Categoría</label>
                                 {!suggestions.isSelected &&
                                     <input 
+                                        ref={categoryInput}
                                         onChange={handleCategory}
                                         onKeyDown={handleKeyDown}
                                         type="text" name="category" id="category" 
@@ -199,9 +251,13 @@ export const AgregarProducto = () => {
                                     <input 
                                         disabled
                                         type="text" name="category" id="category" 
-                                        className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 
+                                        className='block min-w-full bg-gray-100 text-gray-400 rounded-lg mb-4 p-1.5 
                                             focus:outline-none focus:ring-1 focus:ring-gray-200'
                                         value={suggestions.selectedCategory}
+                                    />
+                                    <XCircleIcon className='absolute -top-[-25%] -right-[10px]
+                                                            w-6 text-red-500 cursor-pointer'
+                                                 onClick={clearCategory}                       
                                     />
                                 </>
                                 }
