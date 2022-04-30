@@ -27,7 +27,8 @@ export const AgregarProducto = () => {
         activeSuggestionName:'',
         selectedCategory:'',
         isSelected: false,
-        isLoading: false
+        isLoading: false,
+        suggestionExists: false
     })
 
     const categoryInput = useRef(null)
@@ -79,8 +80,46 @@ export const AgregarProducto = () => {
         console.log(form)
     }
 
-    const handleClickCategory = (key) => {
-        alert('Mouse Enter ' + key)
+    const handleClickCategory = async(key) => {
+        // alert('Mouse Enter ' + key)
+        if(key===suggestions.filteredSuggestions.lenght){
+            console.log('Click en crear')
+            
+            setSuggestions({
+                ...suggestions,
+                isLoading:true
+            })
+            const category = await addCategory(searchTerm)
+            console.log(category)
+            setForm({
+                ...form,
+                category: category.uid
+            })
+            setSuggestions({
+                ...suggestions,
+                filteredSuggestions:[],
+                activeSuggestionUid: '',
+                activeSuggestionName:'',
+                selectedCategory: category.name,
+                isSelected: true,
+                isLoading:false
+            })
+        }
+        else{
+            setSuggestions({
+                ...suggestions,
+                filteredSuggestions:[],
+                activeSuggestionUid: '',
+                activeSuggestionName:'',
+                selectedCategory: suggestions.filteredSuggestions[key].name,
+                isSelected: true
+            })
+            setForm({
+                ...form,
+                category: suggestions.filteredSuggestions[key].uid
+            })
+        }
+
     }
 
     const handleKeyDown = async(e) => {
@@ -152,7 +191,7 @@ export const AgregarProducto = () => {
                 })
                 document.getElementById("category").value = suggestions.filteredSuggestions[suggestions.activeSuggestion+1].name
             }
-            if(suggestions.activeSuggestion===suggestions.filteredSuggestions.length-1){
+            if(suggestions.activeSuggestion===suggestions.filteredSuggestions.length-1 && !suggestions.suggestionExists){
                 setSuggestions({
                     ...suggestions,
                     activeSuggestion: suggestions.activeSuggestion+1,
@@ -181,13 +220,20 @@ export const AgregarProducto = () => {
             isLoading:true
         })
         const categories = await searchCategories(e.target.value)
+
+        //Verificar si lo escrito existe
+        const searchTermExists = categories.some(element => element.name.toLowerCase() === e.target.value.toLowerCase() )
+        console.log('Comparando si existe')
+        console.log(searchTermExists)
         setSuggestions({
             ...suggestions,
             filteredSuggestions: categories,
             activeSuggestion: -1,
             isSelected: false,
-            isLoading: false
+            isLoading: false,
+            suggestionExists: searchTermExists
         })
+
     }
 
     const clearCategory = () => {
@@ -198,7 +244,8 @@ export const AgregarProducto = () => {
             activeSuggestionName:'',
             selectedCategory:'',
             isSelected: false,
-            isLoading: false
+            isLoading: false,
+            suggestionExists: false
         })
         setForm({
             ...form,
@@ -292,7 +339,7 @@ export const AgregarProducto = () => {
 
                                         ))}
 
-                                        {!suggestions.isLoading &&
+                                        {(!suggestions.isLoading && !suggestions.suggestionExists) &&
                                             <div className={
                                                 `${
                                                     suggestions.activeSuggestion===suggestions.filteredSuggestions.length ?
@@ -301,7 +348,7 @@ export const AgregarProducto = () => {
                                                 }`
                                                 
                                             }
-                                            onClick={() => handleClickCategory(suggestions.filteredSuggestions.length)}
+                                            onClick={() => handleClickCategory(suggestions.filteredSuggestions.lenght)}
                                             >
                                                 <i>Crear: {searchTerm}</i>
                                             </div>
