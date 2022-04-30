@@ -150,8 +150,7 @@ export const AgregarProducto = () => {
             }else if(suggestions.activeSuggestion!==-1){       
                 setForm({
                     ...form,
-                    category: suggestions.activeSuggestionUid,
-                    isSelected: true
+                    category: suggestions.activeSuggestionUid
                 })
                 setSuggestions({
                     ...suggestions,
@@ -217,22 +216,37 @@ export const AgregarProducto = () => {
         setSearchTerm(e.target.value)
         setSuggestions({
             ...suggestions,
-            isLoading:true
+            activeSuggestion: -1
         })
-        const categories = await searchCategories(e.target.value)
+        const categories = await searchCategories(e.target.value.trim())
 
         //Verificar si lo escrito existe
-        const searchTermExists = categories.some(element => element.name.toLowerCase() === e.target.value.toLowerCase() )
+        const searchTermExists = categories.some(element => element.name.toLowerCase().trim() === e.target.value.toLowerCase().trim() )
         console.log('Comparando si existe')
         console.log(searchTermExists)
-        setSuggestions({
-            ...suggestions,
-            filteredSuggestions: categories,
-            activeSuggestion: -1,
-            isSelected: false,
-            isLoading: false,
-            suggestionExists: searchTermExists
-        })
+        
+        if(searchTermExists){
+            setSuggestions({
+                ...suggestions,
+                filteredSuggestions: categories,
+                activeSuggestion: 0,
+                isSelected: false,
+                isLoading: false,
+                suggestionExists: searchTermExists,
+                activeSuggestion: 0,
+                activeSuggestionName: categories[0].name,
+                activeSuggestionUid: categories[0].uid
+            })
+        }else {
+            setSuggestions({
+                ...suggestions,
+                filteredSuggestions: categories,
+                activeSuggestion: -1,
+                isSelected: false,
+                isLoading: false,
+                suggestionExists: searchTermExists
+            })
+        }
 
     }
 
@@ -261,7 +275,7 @@ export const AgregarProducto = () => {
     return (
       <>
           <div className='box-content p-2 m-12 rounded-lg bg-white drop-shadow-sm'>
-            <h1 className="text-xl">{"<-"} Agregar producto</h1>
+            <h1 className="text-xl my-3 mx-2">Agregar producto</h1>
                 <form onSubmit={handleForm}>
                     <div className="flex flex-auto">
                         <div className="flex-1 p-2">
@@ -363,7 +377,7 @@ export const AgregarProducto = () => {
                             </textarea>
                         </div>
                     </div>
-                    <button className='bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Guardar</button>
+                    <button className='mx-2 my-2 bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Guardar</button>
                 </form>
           </div> 
       </>
