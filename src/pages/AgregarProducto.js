@@ -229,7 +229,6 @@ export const AgregarProducto = () => {
             setSuggestions({
                 ...suggestions,
                 filteredSuggestions: categories,
-                activeSuggestion: 0,
                 isSelected: false,
                 isLoading: false,
                 suggestionExists: searchTermExists,
@@ -268,8 +267,25 @@ export const AgregarProducto = () => {
         setSearchTerm('')
     }
 
+    const addProduct = async(req) => {
+        const options ={
+            headers:{
+                'x-token': user.token
+            }
+        }
+        console.log('Options')
+        console.log(options)
+        // const {data:{categories}}
+        const {data} = await axios.post(`http://localhost:3000/api/categorias`, req, options)
+        console.log('Category created:')
+        console.log(data)
+
+        return data
+    }
+
     const handleForm = (e) => {
         e.preventDefault()
+
     }
 
     return (
@@ -290,12 +306,12 @@ export const AgregarProducto = () => {
                             
                             />
                             <label htmlFor="purchasePrice" className='text-gray-400'>Precio de compra</label>
-                            <input onChange={handleChange} type="text" name="purchasePrice" id="purchasePrice" 
+                            <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="purchasePrice" id="purchasePrice" 
                             className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
                             
                             />
                             <label htmlFor="salePrice" className='text-gray-400'>Precio de venta</label>
-                            <input onChange={handleChange} type="text" name="salePrice" id="salePrice" 
+                            <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="salePrice" id="salePrice" 
                             className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
                             
                             />
@@ -377,7 +393,7 @@ export const AgregarProducto = () => {
                             </textarea>
                         </div>
                     </div>
-                    <button className='mx-2 my-2 bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Guardar</button>
+                    <button onClick={handleForm} className='mx-2 my-2 bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Guardar</button>
                 </form>
           </div> 
       </>
