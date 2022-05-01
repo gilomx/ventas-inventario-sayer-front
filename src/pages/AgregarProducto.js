@@ -19,6 +19,8 @@ export const AgregarProducto = () => {
     })
     
     const [searchTerm, setSearchTerm] = useState('')
+    const [isSending, setIsSending] = useState(false)
+    const [errors, setErrors] = useState([])
     // const [categories, setCategories] = useState([])
     const [suggestions, setSuggestions] = useState({
         activeSuggestion: -1,
@@ -75,6 +77,10 @@ export const AgregarProducto = () => {
     }
 
     const handleChange = ({ target: { name, value }}) => {
+        //Limpiar error visual
+        const domEl = document.querySelector(`#${name}`)
+        domEl.classList.remove('border', 'border-red-500')
+
         name === 'productCode' ? setForm({...form, [name]: value.toUpperCase()}) : setForm({...form, [name]: value})
         console.log('Form:')
         console.log(form)
@@ -276,16 +282,52 @@ export const AgregarProducto = () => {
         console.log('Options')
         console.log(options)
         // const {data:{categories}}
-        const {data} = await axios.post(`http://localhost:3000/api/categorias`, req, options)
-        console.log('Category created:')
-        console.log(data)
+        await axios.post(`http://localhost:3000/api/productos`, req, options)
+                .catch(error => {
+                    setErrors(error.response.data.errors)
+                    error.response.data.errors.forEach((element) => {
+                        const domEl = document.querySelector(`#${element.param}`)
+                        domEl.classList.add('border', 'border-red-500')
+                        console.log(element.param)
+                        
+                    })
+                    console.log(error.response.data.errors)
+                })
 
-        return data
+        // if (data.data.errors){
+        //     data.errors.forEach((element) => {
+        //         console.log(element.param)
+        //     })
+        // }
+
+        // console.log('Response crear producto:')
+        // console.log(data)
+
+        return 
     }
+
+    // const formValidation = (form) => {
+    //     const errors = {
+    //         fields:[],
+    //         errors: false
+    //     }
+
+    //     if(form.productCode==='') errors.fields.push('productCode')
+    //     if(form.name==='') errors.fields.push('name')
+    //     if(form.purchasePrice==='') errors.fields.push('purchasePrice')
+    //     if(form.salePrice==='') errors.fields.push('salePrice')
+    //     if(form.category==='') errors.fields.push('category')
+    //     if(form.description==='') errors.fields.push('description')
+    //     if(errors.fields) errors.errors = true
+
+    //     console.log(errors)
+    // }
 
     const handleForm = async(e) => {
         e.preventDefault()
-        const product = await addProduct(form)
+        addProduct(form)
+        // formValidation(form)
+        // const product = await addProduct(form)
     }
 
     return (
@@ -295,11 +337,19 @@ export const AgregarProducto = () => {
                 <form onSubmit={handleForm}>
                     <div className="flex flex-auto">
                         <div className="flex-1 p-2">
-                            <label htmlFor="productCode" className='text-gray-400'>Código</label>
-                            <input onChange={handleChange} type="text" name="productCode" id="productCode" 
-                            className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                            value={form.productCode}
-                            />
+                            <div className='inputContainer mb-4'>
+
+                                <label htmlFor="productCode" className='text-gray-400'>Código</label>
+                                <input onChange={handleChange} type="text" name="productCode" id="productCode" 
+                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                                value={form.productCode}
+                                />
+                                {(errors && errors.some( element => element.param === 'productCode')) &&
+                                    <span className='text-red-500 text-sm'>Error</span>
+                                }
+                            
+                            </div>
+                            
                             <label htmlFor="name" className='text-gray-400'>Nombre</label>
                             <input onChange={handleChange} type="text" name="name" id="name"
                             className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200'
