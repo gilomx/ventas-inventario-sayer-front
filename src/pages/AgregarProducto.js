@@ -288,6 +288,8 @@ export const AgregarProducto = () => {
                     error.response.data.errors.forEach((element) => {
                         const domEl = document.querySelector(`#${element.param}`)
                         domEl.classList.add('border', 'border-red-500')
+
+                        const parentNode = domEl.parentNode()
                         console.log(element.param)
                         
                     })
