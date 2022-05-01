@@ -283,9 +283,9 @@ export const AgregarProducto = () => {
         return data
     }
 
-    const handleForm = (e) => {
+    const handleForm = async(e) => {
         e.preventDefault()
-
+        const product = await addProduct(form)
     }
 
     return (
