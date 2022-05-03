@@ -3,7 +3,7 @@ import {useEffect, useState, useRef} from 'react'
 import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
 
-import { XCircleIcon } from '@heroicons/react/solid'
+import { XCircleIcon, ArrowLeftIcon } from '@heroicons/react/solid'
 import Loader from '../components/Loader'
 
 export const AgregarProducto = () => {
@@ -310,6 +310,7 @@ export const AgregarProducto = () => {
             navigate("/productos")
         } catch(error) {
             // setErrors(error.response.data.errors)
+            setIsSending(false)
             let errorObject = {
                 productCode:'',
                 purchasePrice:'',
@@ -335,34 +336,8 @@ export const AgregarProducto = () => {
             console.log('Objeeto error')
             console.log(errorObject)
         }
-        // if (data.data.errors){
-        //     data.errors.forEach((element) => {
-        //         console.log(element.param)
-        //     })
-        // }
-
-        // console.log('Response crear producto:')
-        // console.log(data)
-
         return 
     }
-
-    // const formValidation = (form) => {
-    //     const errors = {
-    //         fields:[],
-    //         errors: false
-    //     }
-
-    //     if(form.productCode==='') errors.fields.push('productCode')
-    //     if(form.name==='') errors.fields.push('name')
-    //     if(form.purchasePrice==='') errors.fields.push('purchasePrice')
-    //     if(form.salePrice==='') errors.fields.push('salePrice')
-    //     if(form.category==='') errors.fields.push('category')
-    //     if(form.description==='') errors.fields.push('description')
-    //     if(errors.fields) errors.errors = true
-
-    //     console.log(errors)
-    // }
 
     const handleForm = async(e) => {
         e.preventDefault()
@@ -372,148 +347,156 @@ export const AgregarProducto = () => {
     }
 
     return (
-      <>
-          <div className='box-content p-2 m-12 rounded-lg bg-white drop-shadow-sm'>
-            <h1 className="text-xl my-3 mx-2">Agregar producto</h1>
-                <form onSubmit={handleForm}>
-                    <div className="flex flex-auto">
-                        <div className="flex-1 p-2">
-                            <div className='inputContainer mb-4'>
+        <div className='box-content relative p-2 m-12 rounded-lg bg-white drop-shadow-sm'>
+            {isSending &&
+                <div className='absolute z-10 m-0 m-auto top-0 bottom-0 opacity-60 right-0 left-0 bg-gray-200 rounded-lg'>
+                    <Loader className='m-auto'/>
+                </div>
+            }
+            <h1 className="text-xl my-3 mx-2">
+                <ArrowLeftIcon 
+                    onClick={() => navigate('/productos')} 
+                    className='w-6 mr-2 text-gray-500 inline cursor-pointer hover:text-sky-600'/>
+                Agregar producto
+            </h1>
+            <form onSubmit={handleForm}>
+                <div className="flex flex-auto">
+                    <div className="flex-1 p-2">
+                        <div className='inputContainer mb-4'>
 
-                                <label htmlFor="productCode" className='text-gray-400'>Código</label>
-                                <input onChange={handleChange} type="text" name="productCode" id="productCode" 
-                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                                value={form.productCode}
-                                />
-                                {errors.productCode &&
-                                    <div className='text-red-500 text-sm'>
-                                        <ErrorShow error={errors.productCode}/>
-                                    </div>
-                                }
-                            
-                            </div>
-                            <div className='inputContainer mb-4'>
-                                <label htmlFor="name" className='text-gray-400'>Nombre</label>
-                                <input onChange={handleChange} type="text" name="name" id="name"
-                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200'
-                                
-                                />
-                                {errors.name &&
-                                    <div className='text-red-500 text-sm'>
-                                        <ErrorShow error={errors.name}/>
-                                    </div>
-                                }
-                            </div>
-                            <div className='inputContainer mb-4'>
-                                <label htmlFor="purchasePrice" className='text-gray-400'>Precio de compra</label>
-                                <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="purchasePrice" id="purchasePrice" 
-                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                                
-                                />
-                                {errors.purchasePrice &&
-                                    <div className='text-red-500 text-sm'>
-                                        <ErrorShow error={errors.purchasePrice}/>
-                                    </div>
-                                }
-                            </div>
-                            <div className='inputContainer mb-4'>
-                                <label htmlFor="salePrice" className='text-gray-400'>Precio de venta</label>
-                                <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="salePrice" id="salePrice" 
-                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                                
-                                />
-                                {errors.salePrice &&
-                                    <div className='text-red-500 text-sm'>
-                                        <ErrorShow error={errors.salePrice}/>
-                                    </div>
-                                }
-                            </div>
-                            
+                            <label htmlFor="productCode" className='text-gray-400'>Código</label>
+                            <input onChange={handleChange} type="text" name="productCode" id="productCode" 
+                            className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                            value={form.productCode}
+                            />
+                            {errors.productCode &&
+                                <div className='text-red-500 text-sm'>
+                                    <ErrorShow error={errors.productCode}/>
+                                </div>
+                            }
+                        
                         </div>
-                        <div className="flex-1 p-2">
+                        <div className='inputContainer mb-4'>
+                            <label htmlFor="name" className='text-gray-400'>Nombre</label>
+                            <input onChange={handleChange} type="text" name="name" id="name"
+                            className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200'
                             
-                            <div className="relative mb-4">
-                                <label htmlFor="category" className='text-gray-400'>Categoría</label>
-                                {!suggestions.isSelected &&
-                                    <input 
-                                        ref={categoryInput}
-                                        onChange={handleCategory}
-                                        onKeyDown={handleKeyDown}
-                                        type="text" name="category" id="category" 
-                                        className='block min-w-full bg-gray-100 rounded-lg p-1.5 
-                                            focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                                    />
-                                }
-
-                                {suggestions.isSelected &&
-                                <>
-                                    <input 
-                                        disabled
-                                        type="text" name="category" id="category" 
-                                        className='block min-w-full bg-gray-100 text-gray-400 rounded-lg p-1.5 
-                                            focus:outline-none focus:ring-1 focus:ring-gray-200'
-                                        value={suggestions.selectedCategory}
-                                    />
-                                    <XCircleIcon className='absolute -top-[-25%] -right-[10px]
-                                                            w-6 text-red-500 cursor-pointer'
-                                                 onClick={clearCategory}                       
-                                    />
-                                </>
-                                }
-
-                                {(searchTerm.length!==0 && suggestions.isSelected===false) &&
-                                    <div className="select-none absolute bg-gray-100 top-[95%] left-0 right-0 rounded-b-lg ring-1 ring-gray-200">
-                                        {suggestions.isLoading &&
-                                            <Loader/>
-                                        }
-                                        {!suggestions.isLoading &&
-                                            suggestions.filteredSuggestions.map((category,key) => (
-
-                                            key === suggestions.activeSuggestion ?
-                                                <div key={key} onClick={() => handleClickCategory(key)} className="py-1 
-                                                    bg-sky-600 text-white px-3 cursor-pointer">
-                                                    {category.name}
-                                                </div>
-                                                :
-                                                <div key={key} onClick={() => handleClickCategory(key)} className="px-2 py-1 
-                                                    hover:bg-sky-600 hover:text-white hover:px-3 cursor-pointer">
-                                                    {category.name}
-                                                </div>
-
-                                        ))}
-
-                                        {(!suggestions.isLoading && !suggestions.suggestionExists) &&
-                                            <div className={
-                                                `${
-                                                    suggestions.activeSuggestion===suggestions.filteredSuggestions.length ?
-                                                    "cursor-pointer py-1 bg-sky-600 text-white px-3" :
-                                                    "cursor-pointer px-2 py-1 hover:bg-sky-600 hover:text-white hover:px-3"
-                                                }`
-                                                
-                                            }
-                                            onClick={() => handleClickCategory(suggestions.filteredSuggestions.lenght)}
-                                            >
-                                                <i>Crear: {searchTerm}</i>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                                {errors.category &&
-                                    <div className='text-red-500 text-sm'>
-                                        <ErrorShow error={'Debes elegir la categoría.'}/>
-                                    </div>
-                                }
-                            </div>
-                            <label htmlFor="description" className='text-gray-400'>Descripción</label>
-                            <textarea onChange={handleChange} name="description" id="description" rows="4"
-                            className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                            >
-                            </textarea>
+                            />
+                            {errors.name &&
+                                <div className='text-red-500 text-sm'>
+                                    <ErrorShow error={errors.name}/>
+                                </div>
+                            }
                         </div>
+                        <div className='inputContainer mb-4'>
+                            <label htmlFor="purchasePrice" className='text-gray-400'>Precio de compra</label>
+                            <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="purchasePrice" id="purchasePrice" 
+                            className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                            
+                            />
+                            {errors.purchasePrice &&
+                                <div className='text-red-500 text-sm'>
+                                    <ErrorShow error={errors.purchasePrice}/>
+                                </div>
+                            }
+                        </div>
+                        <div className='inputContainer mb-4'>
+                            <label htmlFor="salePrice" className='text-gray-400'>Precio de venta</label>
+                            <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="salePrice" id="salePrice" 
+                            className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                            
+                            />
+                            {errors.salePrice &&
+                                <div className='text-red-500 text-sm'>
+                                    <ErrorShow error={errors.salePrice}/>
+                                </div>
+                            }
+                        </div>
+                        
                     </div>
-                    <button onClick={handleForm} className='mx-2 my-2 bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Guardar</button>
-                </form>
-          </div> 
-      </>
+                    <div className="flex-1 p-2">
+                        
+                        <div className="relative mb-4">
+                            <label htmlFor="category" className='text-gray-400'>Categoría</label>
+                            {!suggestions.isSelected &&
+                                <input 
+                                    ref={categoryInput}
+                                    onChange={handleCategory}
+                                    onKeyDown={handleKeyDown}
+                                    type="text" name="category" id="category" 
+                                    className='block min-w-full bg-gray-100 rounded-lg p-1.5 
+                                        focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                                />
+                            }
+
+                            {suggestions.isSelected &&
+                            <>
+                                <input 
+                                    disabled
+                                    type="text" name="category" id="category" 
+                                    className='block min-w-full bg-gray-100 text-gray-400 rounded-lg p-1.5 
+                                        focus:outline-none focus:ring-1 focus:ring-gray-200'
+                                    value={suggestions.selectedCategory}
+                                />
+                                <XCircleIcon className='absolute -top-[-25%] -right-[10px]
+                                                        w-6 text-red-500 cursor-pointer'
+                                            onClick={clearCategory}                       
+                                />
+                            </>
+                            }
+
+                            {(searchTerm.length!==0 && suggestions.isSelected===false) &&
+                                <div className="select-none absolute bg-gray-100 top-[95%] left-0 right-0 rounded-b-lg ring-1 ring-gray-200">
+                                    {suggestions.isLoading &&
+                                        <Loader/>
+                                    }
+                                    {!suggestions.isLoading &&
+                                        suggestions.filteredSuggestions.map((category,key) => (
+
+                                        key === suggestions.activeSuggestion ?
+                                            <div key={key} onClick={() => handleClickCategory(key)} className="py-1 
+                                                bg-sky-600 text-white px-3 cursor-pointer">
+                                                {category.name}
+                                            </div>
+                                            :
+                                            <div key={key} onClick={() => handleClickCategory(key)} className="px-2 py-1 
+                                                hover:bg-sky-600 hover:text-white hover:px-3 cursor-pointer">
+                                                {category.name}
+                                            </div>
+
+                                    ))}
+
+                                    {(!suggestions.isLoading && !suggestions.suggestionExists) &&
+                                        <div className={
+                                            `${
+                                                suggestions.activeSuggestion===suggestions.filteredSuggestions.length ?
+                                                "cursor-pointer py-1 bg-sky-600 text-white px-3" :
+                                                "cursor-pointer px-2 py-1 hover:bg-sky-600 hover:text-white hover:px-3"
+                                            }`
+                                            
+                                        }
+                                        onClick={() => handleClickCategory(suggestions.filteredSuggestions.lenght)}
+                                        >
+                                            <i>Crear: {searchTerm}</i>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            {errors.category &&
+                                <div className='text-red-500 text-sm'>
+                                    <ErrorShow error={'Debes elegir la categoría.'}/>
+                                </div>
+                            }
+                        </div>
+                        <label htmlFor="description" className='text-gray-400'>Descripción</label>
+                        <textarea onChange={handleChange} name="description" id="description" rows="4"
+                        className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                        >
+                        </textarea>
+                    </div>
+                </div>
+                <button onClick={handleForm} className='mx-2 my-2 bg-sky-600 text-white px-6 py-1.5 rounded-lg hover:bg-sky-500'>Guardar</button>
+            </form>
+        </div>
       )
   }
