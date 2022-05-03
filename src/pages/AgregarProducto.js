@@ -1,5 +1,6 @@
 import {useAuth} from '../context/authContext'
 import {useEffect, useState, useRef} from 'react'
+import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
 
 import { XCircleIcon } from '@heroicons/react/solid'
@@ -8,6 +9,7 @@ import Loader from '../components/Loader'
 export const AgregarProducto = () => {
 
     const {user} = useAuth()
+    const navigate = useNavigate()
 
     const [form, setForm] = useState({
         productCode:'',
@@ -86,6 +88,10 @@ export const AgregarProducto = () => {
         //Limpiar error visual
         const domEl = document.querySelector(`#${name}`)
         domEl.classList.remove('border', 'border-red-500')
+        setErrors({
+            ...errors,
+            [name]:''
+        })
 
         name === 'productCode' ? setForm({...form, [name]: value.toUpperCase()}) : setForm({...form, [name]: value})
         console.log('Form:')
@@ -225,6 +231,11 @@ export const AgregarProducto = () => {
 
     const handleCategory = async(e) => {
         e.preventDefault()
+        setErrors({
+            ...errors,
+            category:''
+        })
+
         setSearchTerm(e.target.value)
         setSuggestions({
             ...suggestions,
@@ -279,6 +290,11 @@ export const AgregarProducto = () => {
         setSearchTerm('')
     }
 
+    const ErrorShow = (props) => {
+        const error = props.error
+        return error.split('\n').map(error => <p>{error}</p>);
+    }
+
     const addProduct = async(req) => {
         const options ={
             headers:{
@@ -289,35 +305,36 @@ export const AgregarProducto = () => {
         console.log('Options')
         console.log(options)
         // const {data:{categories}}
-        await axios.post(`http://localhost:3000/api/productos`, req, options)
-                .catch(error => {
-                    // setErrors(error.response.data.errors)
-                    let errorObject = {
-                        productCode:'',
-                        purchasePrice:'',
-                        salePrice:'',
-                        category:'',
-                        name:''
-                    }
+        try {
+            await axios.post(`http://localhost:3000/api/productos`, req, options)
+            navigate("/productos")
+        } catch(error) {
+            // setErrors(error.response.data.errors)
+            let errorObject = {
+                productCode:'',
+                purchasePrice:'',
+                salePrice:'',
+                category:'',
+                name:''
+            }
 
-                    error.response.data.errors.forEach((element) => {
-                        
-                        errorObject = {
-                            ...errorObject,
-                            [element.param]: errorObject[element.param] + element.msg + ``
-                        }
-                        const domEl = document.querySelector(`#${element.param}`)
-                        domEl.classList.add('border', 'border-red-500')
-                        
-                    })
-                    setErrors({
-                        ...errorObject
-                    })
-                    console.log(error.response.data.errors)
-                    console.log('Objeeto error')
-                    console.log(errorObject)
-                })
-
+            error.response.data.errors.forEach((element) => {
+                
+                errorObject = {
+                    ...errorObject,
+                    [element.param]: errorObject[element.param] + element.msg + `\n`
+                }
+                const domEl = document.querySelector(`#${element.param}`)
+                domEl.classList.add('border', 'border-red-500')
+                
+            })
+            setErrors({
+                ...errorObject
+            })
+            console.log(error.response.data.errors)
+            console.log('Objeeto error')
+            console.log(errorObject)
+        }
         // if (data.data.errors){
         //     data.errors.forEach((element) => {
         //         console.log(element.param)
@@ -370,7 +387,7 @@ export const AgregarProducto = () => {
                                 />
                                 {errors.productCode &&
                                     <div className='text-red-500 text-sm'>
-                                        {errors.productCode}
+                                        <ErrorShow error={errors.productCode}/>
                                     </div>
                                 }
                             
@@ -383,7 +400,7 @@ export const AgregarProducto = () => {
                                 />
                                 {errors.name &&
                                     <div className='text-red-500 text-sm'>
-                                        {errors.name}
+                                        <ErrorShow error={errors.name}/>
                                     </div>
                                 }
                             </div>
@@ -395,7 +412,7 @@ export const AgregarProducto = () => {
                                 />
                                 {errors.purchasePrice &&
                                     <div className='text-red-500 text-sm'>
-                                        {errors.purchasePrice}
+                                        <ErrorShow error={errors.purchasePrice}/>
                                     </div>
                                 }
                             </div>
@@ -405,14 +422,11 @@ export const AgregarProducto = () => {
                                 className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
                                 
                                 />
-                                {/* {errors &&
-                                        errors.map((element, key) => (
-                                                element.param==='salePrice' &&
-                                                <>
-                                                <span key={key} className='text-red-500 text-sm'>{element.msg}</span><br/>
-                                                </>
-                                        ))
-                                } */}
+                                {errors.salePrice &&
+                                    <div className='text-red-500 text-sm'>
+                                        <ErrorShow error={errors.salePrice}/>
+                                    </div>
+                                }
                             </div>
                             
                         </div>
@@ -484,14 +498,11 @@ export const AgregarProducto = () => {
                                         }
                                     </div>
                                 }
-                                {/* {errors &&
-                                        errors.map((element, key) => (
-                                                element.param==='category' &&
-                                                <>
-                                                <span key={key} className='text-red-500 text-sm'>Debes elegir una categoría.</span><br/>
-                                                </>
-                                        ))
-                                } */}
+                                {errors.category &&
+                                    <div className='text-red-500 text-sm'>
+                                        <ErrorShow error={'Debes elegir la categoría.'}/>
+                                    </div>
+                                }
                             </div>
                             <label htmlFor="description" className='text-gray-400'>Descripción</label>
                             <textarea onChange={handleChange} name="description" id="description" rows="4"
