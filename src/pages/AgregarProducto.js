@@ -20,7 +20,13 @@ export const AgregarProducto = () => {
     
     const [searchTerm, setSearchTerm] = useState('')
     const [isSending, setIsSending] = useState(false)
-    const [errors, setErrors] = useState([])
+    const [errors, setErrors] = useState({
+        productCode:'',
+        purchasePrice:'',
+        salePrice:'',
+        category:'',
+        name:''
+    })
     // const [categories, setCategories] = useState([])
     const [suggestions, setSuggestions] = useState({
         activeSuggestion: -1,
@@ -279,21 +285,37 @@ export const AgregarProducto = () => {
                 'x-token': user.token
             }
         }
+        setIsSending(true)
         console.log('Options')
         console.log(options)
         // const {data:{categories}}
         await axios.post(`http://localhost:3000/api/productos`, req, options)
                 .catch(error => {
-                    setErrors(error.response.data.errors)
+                    // setErrors(error.response.data.errors)
+                    let errorObject = {
+                        productCode:'',
+                        purchasePrice:'',
+                        salePrice:'',
+                        category:'',
+                        name:''
+                    }
+
                     error.response.data.errors.forEach((element) => {
+                        
+                        errorObject = {
+                            ...errorObject,
+                            [element.param]: errorObject[element.param] + element.msg + ``
+                        }
                         const domEl = document.querySelector(`#${element.param}`)
                         domEl.classList.add('border', 'border-red-500')
-
-                        const parentNode = domEl.parentNode()
-                        console.log(element.param)
                         
                     })
+                    setErrors({
+                        ...errorObject
+                    })
                     console.log(error.response.data.errors)
+                    console.log('Objeeto error')
+                    console.log(errorObject)
                 })
 
         // if (data.data.errors){
@@ -346,32 +368,57 @@ export const AgregarProducto = () => {
                                 className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
                                 value={form.productCode}
                                 />
-                                {(errors && errors.some( element => element.param === 'productCode')) &&
-                                    <span className='text-red-500 text-sm'>Error</span>
+                                {errors.productCode &&
+                                    <div className='text-red-500 text-sm'>
+                                        {errors.productCode}
+                                    </div>
                                 }
                             
                             </div>
-                            
-                            <label htmlFor="name" className='text-gray-400'>Nombre</label>
-                            <input onChange={handleChange} type="text" name="name" id="name"
-                            className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200'
-                            
-                            />
-                            <label htmlFor="purchasePrice" className='text-gray-400'>Precio de compra</label>
-                            <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="purchasePrice" id="purchasePrice" 
-                            className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                            
-                            />
-                            <label htmlFor="salePrice" className='text-gray-400'>Precio de venta</label>
-                            <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="salePrice" id="salePrice" 
-                            className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
-                            
-                            />
+                            <div className='inputContainer mb-4'>
+                                <label htmlFor="name" className='text-gray-400'>Nombre</label>
+                                <input onChange={handleChange} type="text" name="name" id="name"
+                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200'
+                                
+                                />
+                                {errors.name &&
+                                    <div className='text-red-500 text-sm'>
+                                        {errors.name}
+                                    </div>
+                                }
+                            </div>
+                            <div className='inputContainer mb-4'>
+                                <label htmlFor="purchasePrice" className='text-gray-400'>Precio de compra</label>
+                                <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="purchasePrice" id="purchasePrice" 
+                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                                
+                                />
+                                {errors.purchasePrice &&
+                                    <div className='text-red-500 text-sm'>
+                                        {errors.purchasePrice}
+                                    </div>
+                                }
+                            </div>
+                            <div className='inputContainer mb-4'>
+                                <label htmlFor="salePrice" className='text-gray-400'>Precio de venta</label>
+                                <input onChange={handleChange} pattern = '[0-9]*\.?[0-9]*' type="number" name="salePrice" id="salePrice" 
+                                className='block min-w-full bg-gray-100 rounded-lg p-1.5 focus:outline-none focus:ring-1 focus:ring-gray-200' 
+                                
+                                />
+                                {/* {errors &&
+                                        errors.map((element, key) => (
+                                                element.param==='salePrice' &&
+                                                <>
+                                                <span key={key} className='text-red-500 text-sm'>{element.msg}</span><br/>
+                                                </>
+                                        ))
+                                } */}
+                            </div>
                             
                         </div>
                         <div className="flex-1 p-2">
                             
-                            <div className="relative">
+                            <div className="relative mb-4">
                                 <label htmlFor="category" className='text-gray-400'>Categoría</label>
                                 {!suggestions.isSelected &&
                                     <input 
@@ -379,7 +426,7 @@ export const AgregarProducto = () => {
                                         onChange={handleCategory}
                                         onKeyDown={handleKeyDown}
                                         type="text" name="category" id="category" 
-                                        className='block min-w-full bg-gray-100 rounded-lg mb-4 p-1.5 
+                                        className='block min-w-full bg-gray-100 rounded-lg p-1.5 
                                             focus:outline-none focus:ring-1 focus:ring-gray-200' 
                                     />
                                 }
@@ -389,7 +436,7 @@ export const AgregarProducto = () => {
                                     <input 
                                         disabled
                                         type="text" name="category" id="category" 
-                                        className='block min-w-full bg-gray-100 text-gray-400 rounded-lg mb-4 p-1.5 
+                                        className='block min-w-full bg-gray-100 text-gray-400 rounded-lg p-1.5 
                                             focus:outline-none focus:ring-1 focus:ring-gray-200'
                                         value={suggestions.selectedCategory}
                                     />
@@ -437,6 +484,14 @@ export const AgregarProducto = () => {
                                         }
                                     </div>
                                 }
+                                {/* {errors &&
+                                        errors.map((element, key) => (
+                                                element.param==='category' &&
+                                                <>
+                                                <span key={key} className='text-red-500 text-sm'>Debes elegir una categoría.</span><br/>
+                                                </>
+                                        ))
+                                } */}
                             </div>
                             <label htmlFor="description" className='text-gray-400'>Descripción</label>
                             <textarea onChange={handleChange} name="description" id="description" rows="4"
